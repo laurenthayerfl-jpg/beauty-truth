@@ -180,6 +180,20 @@ When working on this project:
 9. Do not introduce paid services or dependencies without explaining why they are needed.
 10. Assume the project owner may not be a professional software developer; explanations should be understandable without sacrificing technical accuracy.
 
+## Content Pipeline Orchestration
+
+- Run the Beauty Truth content pipeline only when Lauren explicitly asks to use or run it for a topic. An ordinary writing, research, or brainstorming request does not activate the pipeline.
+- Before coordinating a run, read `docs/website/content-pipeline.md`, the topic's `pipeline-status.md` if one exists, and all existing artifacts for that run.
+- The normal order is `SEO Researcher → Evidence Researcher → Beauty Truth Writer → Claims Reviewer → Human Review`. The main Codex task coordinates the workflow and delegates only to the existing `seo_researcher`, `evidence_researcher`, `beauty_truth_writer`, and `claims_reviewer` agents. Do not create another orchestrator or unnecessary additional agents.
+- Do not bypass required upstream stages. The Writer must not draft substantive evidence-based skincare content without an adequate Evidence Researcher brief, and every stage must be preserved as a separate project artifact.
+- The evidence brief is the Writer's scientific boundary. The Claims Reviewer must compare the draft with that brief and the traceable sources rather than trusting the Writer's interpretation.
+- Route Claims Review decisions as follows: `PASS` advances to Lauren's review; `PASS WITH MINOR REVISIONS` returns narrowly scoped corrections to the appropriate agent and advances only after they are resolved; `REVISE AND RESUBMIT` returns the work to the Writer and/or Evidence Researcher and requires another Claims Review; `DO NOT PUBLISH` stops the pipeline and reports the reason to Lauren.
+- Citation-integrity or evidence problems return to the Evidence Researcher. Writing, clarity, or voice problems that need no new evidence return to the Writer. Never silently weaken or remove scientific uncertainty merely to pass review.
+- Never invent Lauren's personal or professional perspective. Preserve a specific `[LAUREN INPUT: ...]` placeholder when her input is genuinely needed, and stop for her input before finalization.
+- Keep the states `Researched`, `Drafted`, `Claims Reviewed`, `Human Approved`, and `Published` distinct. `Claims Reviewed` is not `Human Approved`, and `Human Approved` is not `Published`.
+- Stop for Lauren's explicit human approval after Claims Review and before finalization or any publishing workflow. WordPress access, drafting, scheduling, and publishing are separate actions requiring explicit authorization. The content pipeline must never auto-publish.
+- Scientific accuracy and consumer trust outrank SEO and production speed.
+
 ## AI Role
 
 AI supports Beauty Truth but does not replace brand judgment or scientific verification.

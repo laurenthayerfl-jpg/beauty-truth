@@ -24,4 +24,4 @@ Production WordPress access has **not** been provided. Codex must not attempt to
 - `content/` is reserved for future website content work.
 - `research/` is reserved for future supporting research.
 
-No SEO agents or content agents have been created.
+The editorial workflow uses four specialized Codex agents for SEO research, scientific evidence research, drafting, and independent claims review. The main Codex task coordinates them only when Lauren explicitly requests the pipeline. See [The Beauty Truth Content Pipeline](content-pipeline.md) for the operating procedure and human-approval gate.
