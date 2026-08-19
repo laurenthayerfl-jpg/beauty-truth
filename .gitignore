@@ -1,0 +1,38 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.local
+wp-config.php
+
+# Dependencies and generated output
+node_modules/
+vendor/
+dist/
+build/
+coverage/
+
+# Logs, caches, and temporary files
+*.log
+*.tmp
+*.temp
+.cache/
+tmp/
+temp/
+
+# WordPress-generated and sensitive content
+wp-content/uploads/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/backups*/
+*.sql
+*.sql.gz
+
+# Editor and operating-system files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+Desktop.ini
