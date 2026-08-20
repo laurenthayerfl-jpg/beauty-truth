@@ -67,18 +67,35 @@ Never use `Claims Reviewed`, `Human Approved`, and `Published` as synonyms.
 
 For every pipeline run, the main Codex task must:
 
-1. Read `AGENTS.md`, this runbook, relevant website documentation, and any existing status file and artifacts.
+1. Read `AGENTS.md`, this runbook, relevant website documentation, any existing status file, and the current operative artifacts named there. Load superseded artifacts only for audit or targeted comparison when needed.
 2. Create or confirm a normalized topic slug and the per-article pipeline directory.
 3. Create or update the human-readable `pipeline-status.md` file.
-4. Delegate each required stage to the correct existing agent with the exact upstream artifacts it needs.
-5. Save each agent's complete output as the expected artifact before starting the next stage.
-6. Verify each stage's exit criteria rather than treating agent completion as automatic approval.
-7. Route revisions according to the Claims Review decision and issue type.
-8. Preserve prior artifacts and revision history instead of silently overwriting them.
-9. Stop for Lauren whenever her input or approval is required.
-10. Keep WordPress and all production actions outside this pipeline.
+4. Record lightweight stage telemetry when each stage starts, when the agent completes, and when the artifact is saved.
+5. For an existing-article update, retrieve the production article once in read-only mode after the target URL is confirmed and preserve a reusable source snapshot.
+6. Delegate each required stage to the correct existing agent with the current operative upstream artifacts it needs.
+7. Save each agent's completed output directly as the expected artifact before starting the next stage.
+8. Verify each stage's exit criteria rather than treating agent completion as automatic approval.
+9. Route revisions according to the Claims Review decision and issue type, using a compact revision manifest.
+10. Preserve prior artifacts and revision history instead of silently overwriting them.
+11. Avoid making revision agents reread or regenerate large unchanged sections when a targeted correction is sufficient.
+12. Stop for Lauren whenever her input or approval is required.
+13. Keep WordPress and all production actions outside this pipeline.
 
-The `seo_researcher`, `evidence_researcher`, and `claims_reviewer` agents are configured as read-only. They return their work to the main Codex task, which saves that output to the designated artifact without changing its substantive findings. The main task also verifies that the Writer's output is saved in the correct location.
+The `seo_researcher`, `evidence_researcher`, and `claims_reviewer` agents are configured as read-only. All four specialists return their completed stage work to the main Codex task, which is responsible for saving each output directly to the designated artifact without changing its substantive findings or editorial meaning. The Writer's file permissions do not make the Writer a transport or persistence agent.
+
+Do not invoke the Writer or any other specialist agent merely to transfer, chunk, persist, copy, or verify another agent's completed report. If a response is too large for one file operation, the coordinator may save it in local chunks while preserving exact order and content. Specialist-agent turns must represent substantive SEO, evidence, writing, or Claims Review work.
+
+## Direct Artifact Persistence
+
+When a specialist agent completes a stage:
+
+1. Record the agent-completion time in `pipeline-status.md`.
+2. Save the returned output directly to the expected artifact. Do not summarize away required content and do not route the output through another agent.
+3. Verify that the file exists, is complete, and has the expected heading or decision.
+4. Record the artifact-save completion time.
+5. Only then start the dependent downstream stage.
+
+Content verification belongs to the appropriate specialist and required review stage. Coordinator file checks should confirm persistence and routing integrity, not repeat the specialist's substantive analysis.
 
 ## Stage 0 — Pipeline Request
 
@@ -107,12 +124,28 @@ Before delegating, the main Codex task must:
 4. Check whether `docs/website/pipeline/<topic-slug>/` or related research/content already exists.
 5. If a status file exists, resume from it rather than beginning again.
 6. If no run exists, create the pipeline directory and `pipeline-status.md` before Stage 1.
+7. If this is an update and the exact existing article is already known, retrieve it once in read-only mode and save `00-existing-article-snapshot.md`. If Stage 1 first identifies the update target, preserve the article representation obtained during that first retrieval as the snapshot when adequate; otherwise retrieve it once immediately after the decision. Save the snapshot before downstream stages reuse the article.
+
+### Existing-article source snapshot
+
+For an update workflow, `00-existing-article-snapshot.md` must record:
+
+- The article title and exact public URL.
+- Retrieval date and time in `America/New_York`.
+- That retrieval was public and read-only; no WordPress login or administration area was used.
+- The retrieved article body or the fullest reliable representation available.
+- Any retrieval limitation, missing section, redirect, error, or uncertainty.
+
+SEO Research, the Writer, and the Claims Reviewer should reuse this snapshot when it is adequate for content overlap, drafting, and old-to-new fidelity review. Do not repeatedly crawl the same production article merely to give each stage a separate copy. A later live recheck is appropriate only when the snapshot is missing, incomplete, materially stale, or a specific implementation or review question requires current public state; record the reason for the recheck.
+
+The Claims Reviewer remains free to independently verify external scientific, medical, regulatory, and bibliographic sources. Reusing the Beauty Truth article snapshot does not limit that independence.
 
 ### Exit criteria
 
 - The topic and slug are unambiguous.
 - Existing overlapping pipeline work has been identified.
 - The status file exists and points to any known inputs.
+- For a known update target, the existing-article snapshot exists or a retrieval limitation is recorded.
 - The run is ready for SEO research.
 
 ## Stage 1 — SEO Research
@@ -128,6 +161,7 @@ Before delegating, the main Codex task must:
 - `docs/website/research/current-site-audit.md` when relevant.
 - Relevant existing Beauty Truth research and content.
 - The per-article `pipeline-status.md`.
+- `00-existing-article-snapshot.md` when the topic is a confirmed update and the snapshot is available.
 
 ### Tasks
 
@@ -143,6 +177,8 @@ The SEO Researcher should determine:
 - Known limitations in keyword, ranking, analytics, or competitor data.
 
 The SEO Researcher may use qualitative search evidence and verified data that is actually available. It must not invent search volume, keyword difficulty, competition scores, rankings, traffic, or analytics.
+
+For an update, use the saved article snapshot for article-body and overlap analysis when it is adequate. Do not refetch the same production article solely because SEO is a separate stage. If SEO first discovers the update target and no snapshot exists, return the article title, URL, retrieval time, retrieved body or fullest reliable representation, and any retrieval limitations as a separately identified snapshot payload so the coordinator can save that first retrieval as `00-existing-article-snapshot.md`.
 
 ### Expected output
 
@@ -180,7 +216,7 @@ The Evidence Researcher must:
 
 - Turn the reader need into answerable scientific and dermatologic research questions.
 - Locate and actually review credible sources.
-- Verify citation identities, titles, authors, publication details, DOI or stable URL, and accessible source content.
+- Apply the Evidence Researcher's Citation-Integrity Gate to every source supporting a material claim before treating it as approved evidence.
 - Classify conclusions by evidence strength.
 - Separate established evidence from uncertain, conflicting, emerging, mechanistic, or unsupported claims.
 - Record important limitations, population differences, study design concerns, and generalizability limits.
@@ -204,17 +240,34 @@ Prefer sources in this order when they are relevant:
 
 Marketing pages, retailers, influencers, social media, and unsourced skincare sites are not scientific evidence. Abstract-only access must be disclosed. Mechanistic, in vitro, ex vivo, animal, disease-specific, product-specific, or manufacturer-sponsored evidence must not be generalized beyond what it supports.
 
+### Hard citation-identity gate
+
+For every source supporting a material scientific, medical, regulatory, safety, efficacy, formulation, or product-performance claim, the evidence artifact must record:
+
+- A coherent identity appropriate to the source type: title, authors, journal, publisher or issuing organization, and publication year or page date where applicable. Mark a genuinely inapplicable field `N/A` and explain why.
+- DOI resolution to the stated publication when a DOI exists.
+- PMID resolution to the same publication when a PMID exists.
+- Agreement among DOI, PMID, title, authors, publication, and year.
+- Stable URL checked at research time.
+- Actual access level: `full text`, `abstract`, `metadata only`, or a precisely described `other` form of access.
+- Funding, manufacturer involvement, and conflicts when available; otherwise an explicit `unverified` status.
+- The authoritative identity-verification record or records used.
+- One citation status: `VERIFIED FOR CLAIM USE` or `UNRESOLVED — DO NOT USE FOR PUBLIC CLAIMS`.
+
+Never combine plausible bibliographic fields from different records. If identifiers disagree, a link cannot be checked, or the source identity cannot be established, the source must be marked `UNRESOLVED — DO NOT USE FOR PUBLIC CLAIMS`. It may remain only as an explained research lead and must not support the Bottom Line, approved Writer guidance, or a public citation.
+
 ### Expected output
 
 Save the complete evidence brief as:
 
 `docs/website/pipeline/<topic-slug>/02-evidence-brief.md`
 
-The brief must use the Evidence Researcher's configured structure and preserve citation details, evidence-strength labels, limitations, conflicts, medical boundaries, formulation considerations, and unresolved questions.
+The brief must use the Evidence Researcher's configured structure and preserve citation details, citation status, identity-verification record, access level, evidence-strength labels, limitations, conflicts or explicit unverified status, medical boundaries, formulation considerations, and unresolved questions.
 
 ### Exit criteria
 
-- Important sources have been verified and are traceable.
+- Every source supporting a material claim is marked `VERIFIED FOR CLAIM USE` and contains a coherent bibliographic identity, checked stable URL, explicit access level, and identity-verification record.
+- Any unresolved or mismatched source is marked `UNRESOLVED — DO NOT USE FOR PUBLIC CLAIMS` and is excluded from the Bottom Line, approved Writer guidance, and public-claim support.
 - Evidence strength and uncertainty are explicit.
 - Citation, formulation, medical, and generalizability boundaries are documented.
 - The brief states what the Writer can responsibly teach.
@@ -234,6 +287,7 @@ The evidence brief becomes the scientific boundary for the Writer. If the eviden
 - An adequate `02-evidence-brief.md`.
 - `AGENTS.md` and this runbook.
 - Relevant existing Beauty Truth content.
+- `00-existing-article-snapshot.md` for an update workflow.
 - Any actual professional or personal input Lauren has already supplied.
 
 The Writer must not draft substantive evidence-based skincare content if the evidence brief is missing, inadequate, or not clearly associated with the topic.
@@ -251,7 +305,7 @@ The Writer must:
 - Preserve specific `[LAUREN INPUT: ...]` placeholders where Lauren's expertise is genuinely needed.
 - Recommend SEO title, meta description, URL slug, and other relevant publishing fields without keyword stuffing.
 - Recommend internal links only to verified or clearly marked-to-verify Beauty Truth content.
-- Include source notes that let the Claims Reviewer trace important claims to the evidence brief.
+- Include concise claim-to-source notes that let the Claims Reviewer trace material claims to the operative evidence brief without reproducing that brief.
 
 ### Expected output
 
@@ -262,18 +316,21 @@ Save the working draft as:
 The draft artifact should contain:
 
 - A clear status stating that it is a working draft and is not approved for publication.
-- The article draft.
-- SEO recommendations.
-- Internal-link recommendations.
-- Source notes for Claims Review.
+- Complete publication content.
+- Concise SEO and editorial recommendations.
+- Concise internal-link recommendations.
+- Concise claim-to-source traceability for material claims, normally mapped to evidence-brief source numbers or verified citations.
 - Any `[LAUREN INPUT: ...]` placeholders.
-- Known uncertainties or questions for the Claims Reviewer.
+- Material uncertainties or specific questions for the Claims Reviewer.
+
+The Writer artifact must not reproduce a second full evidence brief. Do not duplicate long source abstracts, the Evidence Researcher's complete limitation analysis, exhaustive lists of every claim not made, or large boundary tables when a concise reference to the operative evidence section is sufficient.
 
 ### Exit criteria
 
 - The article answers the documented intent.
 - Its important scientific claims stay within the evidence brief.
 - Required source notes are traceable.
+- The draft is lean enough that the Evidence Researcher artifact remains the single complete scientific record.
 - Lauren's experience has not been invented.
 - SEO and internal-link recommendations are included.
 - The artifact is saved and linked from `pipeline-status.md`.
@@ -291,10 +348,13 @@ The draft artifact should contain:
 - The current `03-draft.md` or its latest revision.
 - The draft's source notes.
 - Relevant existing Beauty Truth content when available.
+- `00-existing-article-snapshot.md` for an update workflow when old-to-new fidelity is in scope.
 
 ### Tasks
 
 The Claims Reviewer must independently compare the draft with the evidence rather than trusting the Writer's interpretation. It must review scientific, medical, regulatory, logical, citation, formulation, generalizability, reader-impression, SEO, and Lauren-expertise boundaries.
+
+For an update workflow, use the saved existing-article snapshot for continuity and fidelity review when it is adequate. The Claims Reviewer may independently verify external scientific, medical, regulatory, safety, and bibliographic sources and may request a live article recheck when the saved snapshot is materially inadequate.
 
 Every finding must use one configured severity:
 
@@ -332,6 +392,33 @@ This saved report is mandatory for every future pipeline run. A review that exis
 
 Use targeted revisions whenever they can fully resolve the findings. Do not order a full rewrite merely because a narrow correction is needed.
 
+### Required revision manifest
+
+Before delegating a revision, the coordinator must create a compact manifest such as `05-revision-notes-r1.md`. It is a routing document, not a second Claims Review Report.
+
+Use this minimum structure:
+
+```markdown
+# Revision Manifest — Round [N]
+
+| Finding | Severity | Responsible stage | Affected source, claim, or passage | Required correction | Scientific meaning changes? |
+|---|---|---|---|---|---|
+| [Claims Review ID or concise finding] | [BLOCKER / MAJOR / MINOR / NOTE] | [SEO Research / Evidence Research / Writer / Claims Review / Coordinator] | [Exact source, claim, heading, or passage] | [Bounded correction] | [Yes / No — explain briefly] |
+
+## Operative Inputs
+
+- Current evidence artifact: [path]
+- Current draft artifact: [path]
+- Claims Review report: [path]
+- Existing-article snapshot, if applicable: [path]
+
+## Required Route
+
+- [Evidence Researcher → Writer → Claims Reviewer / Writer → Claims Reviewer / targeted non-claim editorial correction]
+```
+
+Each revision agent should receive the current operative artifact it must change, the Claims Review findings, and the revision manifest. Include other current artifacts only when they are necessary to understand the correction. Superseded artifacts remain available for audit and spot-checking, but revision agents should not automatically reread them in full.
+
 ### Decision routing
 
 - **`PASS`:** Mark Claims Review complete and advance to Lauren's human review.
@@ -349,11 +436,13 @@ Route in this order:
 
 `Evidence Researcher → Writer → Claims Reviewer`
 
-Save the revised evidence brief, revised draft, and new Claims Review Report as separate revision artifacts.
+Save the revised evidence brief, revised draft, and new Claims Review Report as separate revision artifacts. Scientific, medical, regulatory, safety, efficacy, or citation changes always require a new Claims Review after the affected draft is updated.
 
 ### Writing, clarity, or voice issue with adequate evidence
 
 Return the affected passage to the Writer with the Claims Review finding and its evidentiary boundary. The Writer should change only what is necessary unless the issue genuinely affects the broader structure.
+
+If the revision changes a substantive scientific, medical, regulatory, safety, efficacy, citation, formulation-performance, or other factual meaning, rerun Claims Review. If it is a normal voice, clarity, grammar, or formatting change that does not change meaning, follow the original decision's required review route and document the coordinator's verification in the manifest.
 
 ### Minor formatting or editorial issue
 
@@ -363,6 +452,18 @@ Make or delegate a narrowly scoped correction and document it in revision notes.
 
 Do not advance. Route it to the appropriate agent and rerun Claims Review after correction.
 
+### Targeted revision behavior
+
+Preserve a complete audit trail without asking an agent to regenerate large unchanged sections.
+
+- Ask the responsible specialist for only the corrected source records, conclusions, passages, metadata, or source mappings identified in the revision manifest.
+- Create the next versioned artifact by preserving unchanged content and applying the specialist's returned corrections exactly. The coordinator may perform this mechanical persistence but must not alter scientific or editorial meaning.
+- Keep unchanged sections unchanged where practical. A new revision filename does not require a new introduction, full source re-summary, exhaustive self-audit, or regenerated article body.
+- The new versioned artifact must still be coherent and usable as the current operative artifact. Record in the manifest which sections changed and which prior conclusions remain unchanged.
+- If the correction changes the article's premise, evidence strength, Bottom Line, medical boundary, regulatory boundary, safety guidance, efficacy conclusion, citation support, or another material claim, use `Evidence Researcher → Writer → Claims Reviewer` as applicable.
+- If evidence remains adequate and only writing changes, route only to the Writer and the review step required by the original Claims Review decision and the meaning-change rules above.
+- Never use targeted revision behavior to avoid Claims Review after a substantive scientific, medical, regulatory, safety, efficacy, or citation change.
+
 ### Revision artifact names
 
 Do not overwrite the artifact that was reviewed. For the first revision round, use names such as:
@@ -370,7 +471,7 @@ Do not overwrite the artifact that was reviewed. For the first revision round, u
 - `02-evidence-brief-r2.md` when evidence changes.
 - `03-draft-r2.md` when the draft changes.
 - `04-claims-review-r2.md` for the next Claims Review.
-- `05-revision-notes-r1.md` to map each finding to its resolution.
+- `05-revision-notes-r1.md` as the compact revision manifest mapping each finding to responsibility, affected content, required correction, meaning change, and route.
 
 Use `r3`, `r4`, and so on for later rounds. `pipeline-status.md` must point to the current versions while retaining links to earlier artifacts.
 
@@ -443,6 +544,7 @@ Use one folder per new article:
 ```text
 docs/website/pipeline/<topic-slug>/
 ├── pipeline-status.md
+├── 00-existing-article-snapshot.md  # update workflows only
 ├── 01-seo-brief.md
 ├── 02-evidence-brief.md
 ├── 03-draft.md
@@ -499,6 +601,18 @@ Use this human-readable template:
 | 6. Lauren Human Review | Pending | — | Mandatory stop |
 | 7. Final Editorial Draft | Not started | — | Requires Lauren approval |
 
+## Stage Telemetry
+
+| Stage | Agent invoked | Pass type | External research | Stage started | Agent completed | Artifact saved |
+|---|---|---|---|---|---|---|
+| 0. Request | Main coordinator | Coordination | No | [YYYY-MM-DD HH:MM America/New_York] | N/A | [YYYY-MM-DD HH:MM America/New_York] |
+| 1. SEO Research | `seo_researcher` | Original substantive | [Yes / No] | — | — | — |
+| 2. Evidence Research | `evidence_researcher` | Original substantive | [Yes / No] | — | — | — |
+| 3. Drafting | `beauty_truth_writer` | Original substantive | [Yes / No] | — | — | — |
+| 4. Claims Review | `claims_reviewer` | Original substantive | [Yes / No] | — | — | — |
+| 5. Revisions | [Agent name or Main coordinator] | Revision [N] substantive | [Yes / No] | — | — | — |
+| 6. Lauren Human Review | Lauren / Main coordinator | Human review | No | — | N/A | — |
+
 ## Artifact History
 
 - [Add every artifact path in creation order. Do not remove superseded versions.]
@@ -510,6 +624,17 @@ Use this human-readable template:
 
 Allowed stage-status values are `Not started`, `In progress`, `Complete`, `Needs revision`, `Blocked`, `Failed`, `Not needed`, and `Abandoned`.
 
+Telemetry is lightweight operational history, not a performance promise. Use `YYYY-MM-DD HH:MM America/New_York` and record actual times rather than estimates:
+
+- **Stage started:** when the coordinator begins the stage or delegates to the specialist agent.
+- **Agent completed:** when the specialist's complete response is received. Use `N/A` for coordinator-only or human stages.
+- **Artifact saved:** when the expected artifact has been fully written and its persistence verified.
+- **Agent invoked:** the exact configured agent name, or `Main coordinator`/`Lauren` when no specialist is used.
+- **Pass type:** `Original substantive`, `Revision 1 substantive`, `Revision 2 substantive`, and so on for specialist work; use `Coordination` for coordinator-only setup. Do not label file-transfer or persistence activity as an agent pass.
+- **External research:** `Yes` when the stage accessed public websites, bibliographic databases, journals, government sources, or other external material; otherwise `No`.
+
+Add a telemetry row for each revision-stage invocation rather than overwriting the original row. If a timestamp is unavailable, use `Not recorded`; do not invent or backfill an estimate.
+
 Update the status file when a stage starts, completes, fails, becomes stale, or changes route. The latest artifact paths and the exact next safe action must always be clear enough that a new Codex chat can resume without guessing.
 
 Publication should normally remain `Not authorized` when the content pipeline finishes. Only a separate, explicitly authorized publishing workflow may change it to `Published`.
@@ -518,25 +643,27 @@ Publication should normally remain `Not authorized` when the content pipeline fi
 
 Every future Claims Review Report must be saved to the project. The minimum required artifact is `04-claims-review.md`; every rerun must receive its own revision suffix.
 
-The coordinator must not summarize away the Claims Reviewer's findings and treat the summary as the report. Save the complete structured report, then use `05-revision-notes-r1.md` or later revision notes to show how each required correction was resolved.
+The coordinator must not summarize away the Claims Reviewer's findings and treat the summary as the report. Save the complete structured report, then use `05-revision-notes-r1.md` or a later compact revision manifest to route and track every required correction.
 
 ## Restart and Recovery
 
 The recovery rule is simple:
 
-> Read `pipeline-status.md` and every existing artifact before taking action. Never assume a stage needs to be rerun.
+> Read `pipeline-status.md`, the current operative artifacts named there, the latest Claims Review Report, and the active revision manifest before taking action. Keep superseded artifacts available for audit or spot-checking, but do not automatically reread all of them in full. Never assume a stage needs to be rerun.
 
 ### A run stops halfway through
 
 - Read the status file and artifact history.
 - Verify that the latest listed artifact exists and appears complete.
+- Read the current operative inputs and active revision manifest; consult superseded versions only when needed to resolve history, scope, or a discrepancy.
 - Resume at the documented next safe action.
 - If the status file and artifacts disagree, stop and reconcile the discrepancy before delegating.
 
 ### A chat closes
 
 - Start from the repository root.
-- Read `AGENTS.md`, this runbook, the topic's status file, and its current artifacts.
+- Read `AGENTS.md`, this runbook, the topic's status file, its current operative artifacts, the latest Claims Review Report, and any active revision manifest.
+- Use superseded artifacts for audit or targeted comparison rather than automatically loading each one in full.
 - Continue only the incomplete or required revision stage.
 - Do not rerun completed research merely because the original chat is unavailable.
 
@@ -558,8 +685,9 @@ The recovery rule is simple:
 
 - Save a revised evidence brief with a revision suffix.
 - Mark the current draft and Claims Review as stale in the status file.
-- Send the affected evidence and passages to the Writer.
-- Save the revised draft and rerun Claims Review.
+- Create or update the compact revision manifest with the affected sources, claims, passages, responsibility, required correction, and whether meaning changes.
+- Send the operative evidence, affected passages, Claims Review finding, and manifest to the Writer; do not require a full reread of superseded artifacts unless the correction needs it.
+- Save the targeted revised draft and rerun Claims Review.
 
 ### Lauren requests a revision after approval
 
@@ -613,10 +741,15 @@ Before or during each run, the coordinator must confirm:
 
 - The four agent names exactly match `seo_researcher`, `evidence_researcher`, `beauty_truth_writer`, and `claims_reviewer`.
 - The main Codex task is coordinating; no fifth agent is required.
+- Specialist agents are invoked only for substantive stage work, not artifact transfer or persistence.
 - Every completed stage has a saved, separately named artifact.
+- The coordinator recorded stage-start, agent-completion, and artifact-save telemetry without inventing timestamps.
+- Every material evidence source passed the Citation-Integrity Gate or is marked `UNRESOLVED — DO NOT USE FOR PUBLIC CLAIMS`.
+- An existing-article update has one reusable read-only source snapshot or a documented retrieval limitation.
 - The Claims Review Report is saved rather than left only in chat.
 - `pipeline-status.md` identifies the current stage and next safe action.
 - Required upstream artifacts are complete before downstream delegation.
+- Revision handoffs use the current operative artifacts and compact manifest instead of automatically loading every superseded version.
 - Lauren's approval remains a mandatory stop.
 - WordPress access and publishing remain outside the pipeline.
 - Existing ceramide files remain intact.
@@ -625,6 +758,8 @@ Before or during each run, the coordinator must confirm:
 
 - This is documented coordination, not unattended background automation. A Codex task must still interpret the request, delegate each stage, save outputs, and maintain status.
 - The quality of a run depends on agents receiving the correct, current artifact paths. The main task must verify those paths at every handoff.
+- Citation identity checks improve reliability but do not replace scientific interpretation or independent Claims Review.
+- Existing-article snapshots can become stale; a live recheck is still appropriate when the public page may have materially changed or the snapshot is incomplete.
 - Claims-review routing still requires judgment when a finding mixes evidence and writing problems. When in doubt, resolve evidence integrity first, then return the bounded result to the Writer.
 - Public website and keyword data may be incomplete. The SEO brief must disclose data limitations rather than manufacture precision.
 - Human approval remains intentionally manual, and publishing remains intentionally separate.

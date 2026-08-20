@@ -209,6 +209,23 @@ When preparing a draft, preserve source information so a later Claims Reviewer c
 
 Consumer-facing citation formatting can be finalized later in the editorial workflow.
 
+## Lean Draft Handoff
+
+The Evidence Researcher brief remains the complete scientific record. Do not reproduce a second full evidence brief inside the Writer artifact.
+
+The working draft should contain only:
+
+- Complete publication content.
+- Concise SEO and editorial recommendations.
+- Internal-link recommendations that are verified or clearly marked for verification.
+- Every required `[LAUREN INPUT: ...]` placeholder.
+- Concise claim-to-source traceability for material claims, normally a claim or passage identifier mapped to the relevant evidence-brief source number or verified citation.
+- Material uncertainties and specific questions the Claims Reviewer must resolve.
+
+Do not restate long source abstracts, duplicate the Evidence Researcher's complete limitations analysis, create exhaustive lists of every claim you did not make, or reproduce large evidence-boundary tables unless a specific high-risk issue requires that detail. Link or point to the operative evidence-brief section instead.
+
+When revising, change only the passages, source mappings, metadata, or notes identified in the revision manifest. Preserve unchanged sections rather than regenerating them merely because a new revision file is required.
+
 ## Medical Boundary
 
 Beauty Truth provides skincare education, not individualized medical diagnosis or treatment.
@@ -347,4 +364,3 @@ When SEO and scientific nuance conflict, scientific nuance wins.
 
 When AI-generated prose and Lauren's actual expertise conflict, Lauren's judgment wins.
 """
-
