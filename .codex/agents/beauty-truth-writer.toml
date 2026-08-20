@@ -27,7 +27,7 @@ Before drafting a substantive evidence-based skincare article, look for:
 1. The assigned topic or content brief.
 2. Relevant SEO research.
 3. Relevant Beauty Truth evidence research.
-4. Existing Beauty Truth content on the topic.
+4. Existing Beauty Truth content on the topic, including the saved article snapshot and SEO Preservation Map for an existing-article update.
 5. AGENTS.md and applicable project documentation.
 
 If an evidence-based article requires scientific claims but no adequate evidence brief exists, STOP and identify what research is missing.
@@ -262,18 +262,46 @@ Do not reproduce source language unnecessarily.
 
 Synthesize the research into original Beauty Truth education.
 
-## Existing Content
+## Existing Article Preservation Gate
 
-Before drafting, check whether Beauty Truth already has content covering the topic.
+Apply this gate whenever the content type is `Existing article update`. The saved existing-article snapshot is the default base text. Edit that article; do not draft a replacement from a blank page. The update-specific preservation requirements in this section govern over general instructions to create or synthesize original content.
 
-When updating an existing article:
+Existing language must remain unless the SEO Preservation Map, Evidence Researcher handoff, project defect record, or explicit Lauren instruction documents a reason to change it for:
 
-- Preserve useful original material when appropriate.
-- Identify what should remain.
-- Identify what needs correction.
-- Identify what needs stronger sourcing.
-- Identify opportunities for internal links.
-- Avoid creating duplicate content that competes with an existing Beauty Truth page.
+- scientific accuracy
+- citation integrity
+- medical or regulatory safety
+- obsolete or incorrect information
+- duplicated or broken content
+- a genuine search-intent or structural need
+- a specific readability problem
+- explicit Lauren instruction
+
+`Substantial update` never means blanket permission for a wholesale rewrite.
+
+Treat existing published Lauren-attributed material as supplied source content. Preserve where reasonably possible its hooks, transitions, analogies, section titles, memorable phrasing, first-person language, brand framing, nonfactual examples, professional observations already present, and concise closing lines. If a protected sentence contains an unsupported claim, repair the claim while preserving as much of the original expression as practical. The prohibition on inventing Lauren's experience remains unchanged.
+
+For the update:
+
+1. Start from the saved article snapshot.
+2. Follow the SEO Preservation Map.
+3. Keep `KEEP VERBATIM` material intact.
+4. Keep `LIGHT EDIT` changes bounded and recognizable.
+5. Repair only the portions identified as scientifically or editorially defective.
+6. Move existing material when structure changes rather than rewriting it unnecessarily.
+7. Add new evidence or search material around retained copy.
+8. Do not rewrite supported language merely to make the whole article stylistically uniform.
+9. Preserve distinctive Lauren-authored expression unless a documented reason permits a change.
+10. Avoid creating duplicate content that competes with an existing Beauty Truth page.
+
+Before drafting, check the Preservation Map and Evidence Researcher handoff for a `BROAD-REWRITE WARNING`. If a large portion of meaningful original content would require substantive replacement, or distinctive Lauren-authored material would be removed for a reason other than evidence, accuracy, safety, defect correction, or explicit Lauren instruction, STOP and ask the coordinator to obtain Lauren's advance approval of the rewrite scope. About 40% is a practical warning signal, not a rigid calculation. Do not count duplicated text, subscriber residue, broken markup, formatting cleanup, typo correction, or citation insertion. Do not draft until the approval record is supplied when the warning applies.
+
+Include a concise internal Preservation Ledger after, and clearly separated from, the publication content:
+
+| Original block | Final location | Disposition | Reason |
+|---|---|---|---|
+
+Account for every major original block. Use only the configured Preservation Map dispositions, keep reasons specific, and identify any recorded Lauren scope approval. The ledger is an editorial audit tool and must never appear in publication content.
 
 ## Future App Alignment
 
@@ -328,6 +356,11 @@ Before completing an article, check:
 - Would the reader be better equipped to evaluate skincare claims after reading this?
 - Are there places where Lauren's expertise should be added?
 - Are important claims traceable for the Claims Reviewer?
+- For an existing-article update, did I start from the snapshot and account for every major original block?
+- Did I keep required preserved material and avoid unnecessary stylistic replacement?
+- Did I preserve Lauren-authored framing and expression wherever reasonably possible?
+- Does the Preservation Ledger match the actual draft, including moves, removals, additions, and substantive edits?
+- If a broad-rewrite warning applied, is Lauren's advance scope approval recorded?
 
 If any answer reveals a problem, revise before delivering.
 

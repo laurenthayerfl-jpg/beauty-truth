@@ -72,14 +72,15 @@ For every pipeline run, the main Codex task must:
 3. Create or update the human-readable `pipeline-status.md` file.
 4. Record lightweight stage telemetry when each stage starts, when the agent completes, and when the artifact is saved.
 5. For an existing-article update, retrieve the production article once in read-only mode after the target URL is confirmed and preserve a reusable source snapshot.
-6. Delegate each required stage to the correct existing agent with the current operative upstream artifacts it needs.
-7. Save each agent's completed output directly as the expected artifact before starting the next stage.
-8. Verify each stage's exit criteria rather than treating agent completion as automatic approval.
-9. Route revisions according to the Claims Review decision and issue type, using a compact revision manifest.
-10. Preserve prior artifacts and revision history instead of silently overwriting them.
-11. Avoid making revision agents reread or regenerate large unchanged sections when a targeted correction is sufficient.
-12. Stop for Lauren whenever her input or approval is required.
-13. Keep WordPress and all production actions outside this pipeline.
+6. For an existing-article update, enforce the Existing Article Preservation Gate, including the SEO Preservation Map, pre-draft broad-rewrite check, Writer Preservation Ledger, and separate Claims Reviewer preservation check.
+7. Delegate each required stage to the correct existing agent with the current operative upstream artifacts it needs.
+8. Save each agent's completed output directly as the expected artifact before starting the next stage.
+9. Verify each stage's exit criteria rather than treating agent completion as automatic approval.
+10. Route revisions according to the Claims Review decision and issue type, using a compact revision manifest.
+11. Preserve prior artifacts and revision history instead of silently overwriting them.
+12. Avoid making revision agents reread or regenerate large unchanged sections when a targeted correction is sufficient.
+13. Stop for Lauren whenever her input or approval is required.
+14. Keep WordPress and all production actions outside this pipeline.
 
 The `seo_researcher`, `evidence_researcher`, and `claims_reviewer` agents are configured as read-only. All four specialists return their completed stage work to the main Codex task, which is responsible for saving each output directly to the designated artifact without changing its substantive findings or editorial meaning. The Writer's file permissions do not make the Writer a transport or persistence agent.
 
@@ -140,6 +141,32 @@ SEO Research, the Writer, and the Claims Reviewer should reuse this snapshot whe
 
 The Claims Reviewer remains free to independently verify external scientific, medical, regulatory, and bibliographic sources. Reusing the Beauty Truth article snapshot does not limit that independence.
 
+### Existing Article Preservation Gate
+
+Apply this gate whenever `Content type` is `Existing article update`. It does not apply to a new-article workflow.
+
+The saved existing-article snapshot is the default base text. The Writer must edit the existing article rather than draft a replacement from a blank page. Existing language remains unless a stage documents a reason to change it for scientific accuracy, citation integrity, medical or regulatory safety, obsolete or incorrect information, duplicated or broken content, a genuine search-intent or structural need, a specific readability problem, or explicit Lauren instruction. Calling an assignment a `substantial update` never grants blanket permission for a wholesale rewrite.
+
+Treat existing published Lauren-attributed material as supplied source content. Preserve, where reasonably possible:
+
+- Hooks and transitions.
+- Analogies and nonfactual examples.
+- Section titles and memorable phrasing.
+- First-person language and brand framing.
+- Professional observations already present.
+- Concise closing lines.
+
+If protected language contains an unsupported claim, repair the claim as narrowly as practical while retaining the safe expression around it. This protection never permits inventing, extending, or falsely attributing Lauren's experience.
+
+The gate is implemented inside the existing four stages:
+
+1. SEO Research creates the Existing Article Preservation Map.
+2. Evidence Research identifies the exact factual claims that require repair and the safe surrounding prose that can remain.
+3. The Writer edits the snapshot under the map and produces an internal Preservation Ledger.
+4. The Claims Reviewer performs a separate preservation check in addition to scientific Claims Review.
+
+No new agent or pipeline stage is created.
+
 ### Exit criteria
 
 - The topic and slug are unambiguous.
@@ -180,18 +207,36 @@ The SEO Researcher may use qualitative search evidence and verified data that is
 
 For an update, use the saved article snapshot for article-body and overlap analysis when it is adequate. Do not refetch the same production article solely because SEO is a separate stage. If SEO first discovers the update target and no snapshot exists, return the article title, URL, retrieval time, retrieved body or fullest reliable representation, and any retrieval limitations as a separately identified snapshot payload so the coordinator can save that first retrieval as `00-existing-article-snapshot.md`.
 
+For an existing-article update, the SEO brief must also contain an **Existing Article Preservation Map**. Account for every meaningful original content block by heading, stable label, or recognizable opening words and assign exactly one primary disposition:
+
+| Disposition | Meaning |
+|---|---|
+| `KEEP VERBATIM` | Accurate, useful material remains unchanged. |
+| `LIGHT EDIT` | A bounded, recognizable edit is needed for readability, precision, or integration. |
+| `CLAIM REPAIR — EVIDENCE` | A specific factual claim requires evidence-led removal, narrowing, qualification, replacement, or stronger support. |
+| `MOVE — SEO/STRUCTURE` | Useful material changes location for reader intent or structure; moving does not authorize rewriting. |
+| `REMOVE — DEFECT` | A stated defect justifies removal, such as duplication, broken content, obsolete or incorrect information, or a medical/regulatory safety problem. |
+| `ADD — EVIDENCE/SEARCH` | New material fills a stated evidence or search-intent gap. |
+| `LAUREN DECISION` | The disposition or rewrite scope cannot be resolved from the evidence, permitted change reasons, and Lauren's existing instructions; use this especially when a proposed change to protected expression lacks another valid reason. |
+
+Default to preserving accurate, useful supported material. Distinguish material that genuinely needs correction from material that only needs moving, genuinely new information required for search intent, and existing Lauren-authored material that is already useful and accurate. SEO architecture recommendations do not authorize copy replacement.
+
+Add a `BROAD-REWRITE WARNING` when the map suggests that a large portion of meaningful original content may require substantive replacement, or protected Lauren-authored material may be removed without an evidence, accuracy, safety, defect-correction, or explicit-Lauren reason. About 40% is a practical warning signal, not a rigid calculation. Do not count duplicated text, subscriber residue, broken markup, formatting cleanup, typo correction, or citation insertion. Identify the affected blocks and reasons.
+
 ### Expected output
 
 Save the complete SEO brief as:
 
 `docs/website/pipeline/<topic-slug>/01-seo-brief.md`
 
-The brief should include the proposed content role, primary intent, audience questions, overlap findings, internal-link opportunities, limitations, and recommended next step. It should clearly separate confirmed observations from interpretations and unknowns.
+The brief should include the proposed content role, primary intent, audience questions, overlap findings, internal-link opportunities, limitations, and recommended next step. It should clearly separate confirmed observations from interpretations and unknowns. For an existing-article update, it must also include the complete Existing Article Preservation Map and any broad-rewrite warning.
 
 ### Exit criteria
 
 - The reader intent and content opportunity are clear enough to frame a scientific research question.
 - Existing content overlap has been checked.
+- For an existing-article update, every meaningful original block is accounted for in the Preservation Map with a reasoned disposition.
+- For an existing-article update, protected Lauren-authored expression is identified where present, and any possible broad rewrite is flagged without treating SEO structure as rewriting authority.
 - Unsupported quantitative SEO claims are absent.
 - Limitations are explicit.
 - The artifact is saved and linked from `pipeline-status.md`.
@@ -209,6 +254,7 @@ If the SEO stage finds that the proposed article would duplicate existing conten
 - `AGENTS.md`.
 - Relevant Beauty Truth research and existing content.
 - Any specific scientific questions or claims identified during SEO research.
+- For an existing-article update, `00-existing-article-snapshot.md` and the Existing Article Preservation Map inside `01-seo-brief.md`.
 
 ### Tasks
 
@@ -225,6 +271,8 @@ The Evidence Researcher must:
 - Distinguish ingredient biology from finished-formulation performance.
 - Identify claims the Writer must avoid or qualify.
 - Actively look for credible contradictory evidence and alternative explanations.
+- For an existing-article update, map every factual block marked `CLAIM REPAIR — EVIDENCE`, `REMOVE — DEFECT`, or otherwise questioned on evidence grounds to the exact claim requiring removal, narrowing, qualification, replacement, or new evidence.
+- For an existing-article update, identify scientifically safe surrounding prose that can remain where practical; one defective claim does not automatically justify replacing its entire paragraph.
 
 ### Evidence and source standards
 
@@ -262,7 +310,7 @@ Save the complete evidence brief as:
 
 `docs/website/pipeline/<topic-slug>/02-evidence-brief.md`
 
-The brief must use the Evidence Researcher's configured structure and preserve citation details, citation status, identity-verification record, access level, evidence-strength labels, limitations, conflicts or explicit unverified status, medical boundaries, formulation considerations, and unresolved questions.
+The brief must use the Evidence Researcher's configured structure and preserve citation details, citation status, identity-verification record, access level, evidence-strength labels, limitations, conflicts or explicit unverified status, medical boundaries, formulation considerations, and unresolved questions. For an existing-article update, `Implications for Beauty Truth` must include a concise claim-repair handoff identifying the affected original block, exact defective claim, required evidence action, and safe surrounding prose that can remain where practical.
 
 ### Exit criteria
 
@@ -271,10 +319,31 @@ The brief must use the Evidence Researcher's configured structure and preserve c
 - Evidence strength and uncertainty are explicit.
 - Citation, formulation, medical, and generalizability boundaries are documented.
 - The brief states what the Writer can responsibly teach.
+- For an existing-article update, every evidence-questioned original claim has a bounded repair instruction, and the brief does not use one bad claim to authorize unnecessary paragraph replacement.
+- For an existing-article update, any evidence-driven expansion of the possible rewrite scope is flagged for the coordinator.
 - The artifact is saved and linked from `pipeline-status.md`.
 - The evidence is adequate for the proposed premise, or the brief clearly explains why it is not.
 
 The evidence brief becomes the scientific boundary for the Writer. If the evidence cannot responsibly support the premise, the coordinator must stop and report that conclusion to Lauren rather than asking the Writer to make the article sound more certain.
+
+### Pre-draft broad-rewrite escalation for updates
+
+After Stage 2 and before delegating Stage 3 for an existing-article update, the coordinator must compare the SEO Preservation Map with the Evidence Researcher claim-repair handoff.
+
+Stop before drafting and ask Lauren to approve the proposed rewrite scope when either condition applies:
+
+- A large portion of meaningful original content appears to require substantive replacement.
+- Distinctive Lauren-authored material would be removed for a reason other than evidence, accuracy, safety, defect correction, or explicit Lauren instruction.
+
+About 40% of meaningful original content is a practical warning signal, not an inflexible mathematical rule. Exclude duplicated text, subscriber residue, broken markup, formatting cleanup, typo correction, and citation insertion from the assessment. Use editorial judgment and name the affected blocks and reasons.
+
+Record one of these outcomes in `pipeline-status.md`:
+
+- `Not triggered`.
+- `Pending Lauren scope approval — drafting blocked`.
+- `Approved by Lauren on YYYY-MM-DD — [bounded scope]`.
+
+An unresolved `LAUREN DECISION` affecting rewrite scope also blocks Stage 3. This is advance approval of rewrite scope only; it does not replace Claims Review or Lauren's mandatory final human approval.
 
 ## Stage 3 — Drafting
 
@@ -288,6 +357,8 @@ The evidence brief becomes the scientific boundary for the Writer. If the eviden
 - `AGENTS.md` and this runbook.
 - Relevant existing Beauty Truth content.
 - `00-existing-article-snapshot.md` for an update workflow.
+- The Existing Article Preservation Map in `01-seo-brief.md` and the existing-claim repair handoff in the operative evidence brief for an update workflow.
+- The recorded broad-rewrite outcome and Lauren's advance scope approval when that warning was triggered.
 - Any actual professional or personal input Lauren has already supplied.
 
 The Writer must not draft substantive evidence-based skincare content if the evidence brief is missing, inadequate, or not clearly associated with the topic.
@@ -307,6 +378,21 @@ The Writer must:
 - Recommend internal links only to verified or clearly marked-to-verify Beauty Truth content.
 - Include concise claim-to-source notes that let the Claims Reviewer trace material claims to the operative evidence brief without reproducing that brief.
 
+For an existing-article update, the Writer must also:
+
+1. Start from the saved article snapshot rather than a blank page.
+2. Follow the SEO Preservation Map.
+3. Keep `KEEP VERBATIM` material intact.
+4. Keep `LIGHT EDIT` changes bounded and recognizable.
+5. Repair only the portions identified as scientifically or editorially defective.
+6. Move existing material when structure changes rather than rewriting it unnecessarily.
+7. Add new evidence or search material around retained copy.
+8. Avoid rewriting supported language merely to make the entire article stylistically uniform.
+9. Preserve distinctive Lauren-authored hooks, transitions, analogies, headings, memorable phrasing, first-person language, framing, nonfactual examples, existing professional observations, and concise closing lines unless a documented reason permits a change.
+10. Produce an internal Preservation Ledger accounting for every major original block.
+
+If the supplied map, evidence handoff, or Writer's own faithful application of them reveals a broad-rewrite warning that lacks Lauren's recorded advance scope approval, the Writer must stop without drafting and return the unresolved scope to the coordinator.
+
 ### Expected output
 
 Save the working draft as:
@@ -322,6 +408,12 @@ The draft artifact should contain:
 - Concise claim-to-source traceability for material claims, normally mapped to evidence-brief source numbers or verified citations.
 - Any `[LAUREN INPUT: ...]` placeholders.
 - Material uncertainties or specific questions for the Claims Reviewer.
+- For an existing-article update, a concise internal Preservation Ledger, clearly separated from publication content and using this structure:
+
+  | Original block | Final location | Disposition | Reason |
+  |---|---|---|---|
+
+  The ledger is an editorial audit tool and must not appear in publication content. It must use the configured Preservation Map dispositions, identify every major original block, and record any applicable Lauren scope approval.
 
 The Writer artifact must not reproduce a second full evidence brief. Do not duplicate long source abstracts, the Evidence Researcher's complete limitation analysis, exhaustive lists of every claim not made, or large boundary tables when a concise reference to the operative evidence section is sufficient.
 
@@ -333,6 +425,11 @@ The Writer artifact must not reproduce a second full evidence brief. Do not dupl
 - The draft is lean enough that the Evidence Researcher artifact remains the single complete scientific record.
 - Lauren's experience has not been invented.
 - SEO and internal-link recommendations are included.
+- For an existing-article update, every major original block is accounted for and the Preservation Ledger matches the actual draft.
+- For an existing-article update, all `KEEP VERBATIM` and other required preserved material remains; `LIGHT EDIT` changes are bounded and recognizable.
+- For an existing-article update, every substantive rewrite or removal has a documented valid reason, and scientifically safe surrounding prose was retained where practical.
+- For an existing-article update, Lauren-authored framing and expression were not unnecessarily erased.
+- For an existing-article update, any broad-rewrite warning received Lauren's advance scope approval before drafting.
 - The artifact is saved and linked from `pipeline-status.md`.
 - The draft is ready for independent Claims Review, not publication.
 
@@ -348,13 +445,25 @@ The Writer artifact must not reproduce a second full evidence brief. Do not dupl
 - The current `03-draft.md` or its latest revision.
 - The draft's source notes.
 - Relevant existing Beauty Truth content when available.
-- `00-existing-article-snapshot.md` for an update workflow when old-to-new fidelity is in scope.
+- `00-existing-article-snapshot.md` for every update workflow.
+- For an update workflow, the Existing Article Preservation Map, Writer Preservation Ledger, Evidence Researcher claim-repair handoff, and any broad-rewrite scope approval record.
 
 ### Tasks
 
 The Claims Reviewer must independently compare the draft with the evidence rather than trusting the Writer's interpretation. It must review scientific, medical, regulatory, logical, citation, formulation, generalizability, reader-impression, SEO, and Lauren-expertise boundaries.
 
 For an update workflow, use the saved existing-article snapshot for continuity and fidelity review when it is adequate. The Claims Reviewer may independently verify external scientific, medical, regulatory, safety, and bibliographic sources and may request a live article recheck when the saved snapshot is materially inadequate.
+
+For an update workflow, the Claims Reviewer must also perform an **Existing-Content Preservation Check** that is separate from scientific Claims Review. It must answer:
+
+1. Were unsupported claims corrected?
+2. Was accurate existing prose unnecessarily replaced?
+3. Were Lauren-attributed hooks, examples, framing, analogies, and voice preserved where possible?
+4. Does every removal or substantive rewrite have a valid documented reason?
+5. Did SEO restructuring accidentally become wholesale copy replacement?
+6. If a broad rewrite occurred, was Lauren's advance scope approval recorded?
+
+The Reviewer must verify that every major original block is accounted for and the Preservation Ledger matches the actual draft. A scientifically correct article can still fail this preservation check. Unauthorized substantial replacement of protected existing material is a `MAJOR` editorial issue. A higher severity applies only when the same change independently meets the configured criteria for that severity.
 
 Every finding must use one configured severity:
 
@@ -380,10 +489,14 @@ The Claims Reviewer is read-only, so the main Codex task is responsible for savi
 
 This saved report is mandatory for every future pipeline run. A review that exists only in chat does not satisfy the pipeline requirements.
 
+For an existing-article update, the report must include a clearly separate `Existing-Content Preservation Check` subsection answering all six questions, assessing ledger accuracy, identifying unauthorized removals or rewrites, and confirming any required scope approval. Do not collapse preservation into the scientific decision without reporting it.
+
 ### Exit criteria
 
 - The report contains every required section from the Claims Reviewer configuration.
 - Important claims have been compared with the evidence brief and traceable sources.
+- For an existing-article update, the separate preservation check is complete, the ledger has been tested against the draft, and any preservation finding has an explicit severity and required correction.
+- For an existing-article update, the draft cannot advance with an unresolved unauthorized substantial replacement of protected material.
 - The report gives one valid decision.
 - Required corrections and routing are unambiguous.
 - The artifact and decision are recorded in `pipeline-status.md`.
@@ -584,6 +697,7 @@ Use this human-readable template:
 - **Overall state:** [Requested / Researched / Drafted / Claims Reviewed / Human Approved / Published / Stopped]
 - **Claims Review decision:** [Not run / PASS / PASS WITH MINOR REVISIONS / REVISE AND RESUBMIT / DO NOT PUBLISH]
 - **Lauren input required:** [No / Yes — describe the exact input]
+- **Existing-article rewrite scope:** [N/A / Not triggered / Pending Lauren scope approval — drafting blocked / Approved by Lauren on YYYY-MM-DD — bounded scope]
 - **Human approval:** [Pending / Approved on YYYY-MM-DD / Changes requested / Abandoned]
 - **Publication status:** [Not started / Not authorized / Published separately on YYYY-MM-DD]
 - **Last updated:** [YYYY-MM-DD HH:MM America/New_York]
@@ -746,6 +860,10 @@ Before or during each run, the coordinator must confirm:
 - The coordinator recorded stage-start, agent-completion, and artifact-save telemetry without inventing timestamps.
 - Every material evidence source passed the Citation-Integrity Gate or is marked `UNRESOLVED — DO NOT USE FOR PUBLIC CLAIMS`.
 - An existing-article update has one reusable read-only source snapshot or a documented retrieval limitation.
+- An existing-article update has a complete SEO Preservation Map that defaults accurate, useful material to preservation.
+- Before drafting an existing-article update, any broad-rewrite warning is either not triggered or has Lauren's recorded advance scope approval.
+- An existing-article draft has a Preservation Ledger that matches the article and accounts for every major original block.
+- Claims Review of an existing-article update includes a preservation check separate from scientific review, and no unauthorized substantial replacement remains unresolved.
 - The Claims Review Report is saved rather than left only in chat.
 - `pipeline-status.md` identifies the current stage and next safe action.
 - Required upstream artifacts are complete before downstream delegation.
@@ -760,6 +878,7 @@ Before or during each run, the coordinator must confirm:
 - The quality of a run depends on agents receiving the correct, current artifact paths. The main task must verify those paths at every handoff.
 - Citation identity checks improve reliability but do not replace scientific interpretation or independent Claims Review.
 - Existing-article snapshots can become stale; a live recheck is still appropriate when the public page may have materially changed or the snapshot is incomplete.
+- Preservation dispositions and the broad-rewrite warning require editorial judgment. The map, ledger, independent review, and Lauren escalation make that judgment visible, but they cannot turn voice preservation into a purely mechanical percentage calculation.
 - Claims-review routing still requires judgment when a finding mixes evidence and writing problems. When in doubt, resolve evidence integrity first, then return the bounded result to the Writer.
 - Public website and keyword data may be incomplete. The SEO brief must disclose data limitations rather than manufacture precision.
 - Human approval remains intentionally manual, and publishing remains intentionally separate.

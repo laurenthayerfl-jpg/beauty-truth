@@ -26,6 +26,7 @@ Before reviewing a substantive evidence-based article, read:
 4. Relevant SEO research.
 5. Source notes included with the draft.
 6. Relevant existing Beauty Truth content when available.
+7. For an existing-article update: the saved existing-article snapshot, SEO Preservation Map, Writer Preservation Ledger, and any broad-rewrite scope approval record.
 
 If a required input is missing, inaccessible, ambiguous, or not clearly associated with the draft, identify that limitation prominently. Do not pretend the review is complete. The Evidence Researcher brief establishes the working scientific evidence base, but independently compare the Writer's statements with that evidence rather than assuming the Writer interpreted it correctly.
 
@@ -176,6 +177,19 @@ Flag content that violates Beauty Truth principles through:
 
 The goal is accurate nuance, not skepticism for its own sake.
 
+## Existing-Content Preservation Review
+
+When the content type is `Existing article update`, perform a preservation review that is separate from scientific Claims Review. Compare the saved snapshot, SEO Preservation Map, Evidence Researcher claim-repair handoff, operative draft, Preservation Ledger, and any Lauren scope approval. Answer each question explicitly:
+
+1. Were unsupported claims corrected?
+2. Was accurate existing prose unnecessarily replaced?
+3. Were Lauren-attributed hooks, examples, framing, analogies, and voice preserved where possible?
+4. Does every removal or substantive rewrite have a valid documented reason?
+5. Did SEO restructuring accidentally become wholesale copy replacement?
+6. If a broad rewrite occurred, was Lauren's advance scope approval recorded?
+
+Verify that every major original block is accounted for and that the Preservation Ledger matches the actual draft. A scientifically correct article can still fail this preservation review. Treat unauthorized substantial replacement of protected existing material as a `MAJOR` editorial issue. Use a higher severity only when the same change independently meets the configured criteria for that higher severity; do not alter the existing severity system.
+
 ## Lauren Expertise Boundary
 
 Flag any statement that appears to attribute personal experience, client observations, professional opinions, treatment-room experiences, quotes, or personal recommendations to Lauren unless Lauren actually supplied that information.
@@ -204,6 +218,8 @@ Must be corrected before publication. Use for false or unsupported scientific cl
 ### MAJOR
 
 A substantive issue that could mislead readers or weaken scientific credibility.
+
+For an existing-article update, unauthorized substantial replacement of protected existing material is also a `MAJOR` editorial issue even when the replacement is scientifically accurate.
 
 ### MINOR
 
@@ -277,6 +293,10 @@ Identify technically accurate or defensible language that could still create a m
 ### 10. Lauren Expertise Check
 
 Confirm whether any professional experience, personal observation, opinion, quote, or recommendation appears to have been invented. Treat [LAUREN INPUT: ...] placeholders as acceptable.
+
+### Existing-Content Preservation Check — Update Workflows Only
+
+For an existing-article update, answer all six configured preservation questions, state whether the Preservation Ledger is accurate and complete, identify each unauthorized removal or substantive rewrite, and state whether any required Lauren scope approval was recorded. Do not merge a preservation pass into the scientific decision without reporting it. For a new article, this update-only section is not required.
 
 ### 11. Claims That Were Handled Well
 

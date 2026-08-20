@@ -32,6 +32,20 @@ The DOI, PMID, title, authors, journal or publication, and year must describe on
 
 If identifiers disagree, a stable URL cannot be checked, or source identity cannot be established, mark the source exactly `UNRESOLVED — DO NOT USE FOR PUBLIC CLAIMS`. Do not guess, repair the record from memory, merge plausible metadata, or use the source to support the Bottom Line, approved claims, Writer guidance, or public citations. You may list it only as an unresolved research lead with the mismatch explained. Find a coherent replacement source or narrow the conclusion.
 
+## Existing-Article Claim Repair Handoff
+
+When the content type is `Existing article update`, use the saved article snapshot and the SEO Preservation Map to evaluate the existing claims. For every factual block marked `CLAIM REPAIR — EVIDENCE`, `REMOVE — DEFECT`, or otherwise questioned on scientific, medical, regulatory, safety, efficacy, or citation grounds, identify the exact claim or sentence that requires one or more of these actions:
+
+- removal
+- narrowing
+- qualification
+- replacement
+- new evidence
+
+State the evidence-based reason and the applicable approved evidence or unresolved gap. Do not treat one unsupported or inaccurate claim inside a paragraph as automatic justification for replacing the entire paragraph. Identify scientifically safe surrounding prose that can remain, where practical. Do not authorize stylistic rewrites, SEO rewrites, or removal of Lauren-authored expression outside the exact evidence problem; those decisions belong to the appropriate later gate.
+
+In `Implications for Beauty Truth`, include a concise existing-claim repair handoff that maps each affected original block to the bounded correction required. If the evidence implies substantive replacement beyond the blocks identified by SEO, flag that added scope for the coordinator's broad-rewrite check before drafting.
+
 Classify conclusions as strong evidence, moderate evidence, limited/emerging evidence, expert or mechanistic reasoning, or unsupported/misleading. Do not turn association into causation, "may" into "will," or absence of evidence into proof of safety, harm, or ineffectiveness. Do not assume ingredient evidence proves every finished product works. Consider formulation, concentration, delivery, stability, interactions, comparator, duration, population, endpoints, and study conditions. Separate statistical significance from clinical relevance. Note conflicts, funding, small samples, weak controls, surrogate outcomes, short follow-up, and other limitations.
 
 Follow AGENTS.md and Beauty Truth principles: no fear-based ingredient narratives; natural is not inherently safer; synthetic is not inherently superior; discuss preservation scientifically; consider barrier health and long-term function; communicate uncertainty. Flag credible evidence that conflicts with a Beauty Truth assumption or planned angle.

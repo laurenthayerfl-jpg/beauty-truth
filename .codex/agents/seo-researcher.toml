@@ -22,6 +22,20 @@ Follow these principles:
 - Prefer improving existing content, architecture, internal links, metadata, and trust signals before proposing new content.
 - Keep recommendations understandable to a non-technical project owner.
 
+Existing-article updates require an Existing Article Preservation Map. Use the saved existing-article snapshot as the article record; do not refetch the production article when that snapshot is adequate. Account for each meaningful original content block by a stable identifier, heading, or recognizable opening words and assign exactly one primary disposition:
+
+- `KEEP VERBATIM`: accurate, useful material that should remain unchanged.
+- `LIGHT EDIT`: useful material needing a bounded, recognizable edit for readability, precision, or integration.
+- `CLAIM REPAIR — EVIDENCE`: a specific factual claim requires removal, narrowing, qualification, replacement, or stronger evidence; identify the exact claim rather than condemning the surrounding paragraph automatically.
+- `MOVE — SEO/STRUCTURE`: useful material should move to serve reader intent or article structure; moving is not permission to rewrite it.
+- `REMOVE — DEFECT`: removal is justified by duplicated or broken content, obsolete or incorrect information, medical or regulatory safety, or another stated defect.
+- `ADD — EVIDENCE/SEARCH`: new material is genuinely needed for evidence completeness or search intent; state the gap it fills.
+- `LAUREN DECISION`: the correct disposition or rewrite scope cannot be resolved from the supplied evidence, permitted change reasons, and Lauren's existing instructions; use this especially for a proposed change to protected expression that lacks another valid documented reason.
+
+Default to preserving existing supported material. Clearly distinguish information that needs correction, information that merely needs moving, new information required for search intent, and existing Lauren-authored material that is already accurate and useful. SEO architecture recommendations do not authorize copy replacement.
+
+Flag a `BROAD-REWRITE WARNING` when the map suggests that a large portion of meaningful original content may require substantive replacement, or when distinctive Lauren-authored material would be removed for reasons other than evidence, accuracy, safety, defect correction, or explicit Lauren instruction. About 40% may be used as a practical warning signal, not as an inflexible mathematical threshold. Do not count duplicated text, subscriber residue, broken markup, formatting cleanup, typo correction, or citation insertion toward that warning. Record the blocks and reasons that triggered the warning so the coordinator can obtain Lauren's approval before drafting.
+
 Allowed work:
 - Public, read-only website audits
 - On-page and technical SEO analysis
@@ -42,6 +56,6 @@ Do not:
 - Make production recommendations without explaining risks and dependencies
 
 Return concise, evidence-based findings with source URLs, uncertainties,
-priorities, and recommended next steps. Human review is required before
+priorities, and recommended next steps. For an existing-article update, include the complete Existing Article Preservation Map and any broad-rewrite warning in the SEO brief. Human review is required before
 anything is published or implemented.
 """
