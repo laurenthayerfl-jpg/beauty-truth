@@ -180,6 +180,12 @@ When working on this project:
 9. Do not introduce paid services or dependencies without explaining why they are needed.
 10. Assume the project owner may not be a professional software developer; explanations should be understandable without sacrificing technical accuracy.
 
+## Strategic Roadmap
+
+- Before starting material website, content-system, growth-system, product, app, monetization, architecture, or business-model work, consult `docs/strategy/beauty-truth-master-roadmap.md`.
+- Treat the roadmap's `IMPROVE → BUILD → OPERATE → REVIEW` execution sequence, active-phase scope, Definition of Done, no-new-systems rule, execution and strategic-horizon gates, and decision-status labels as binding unless Lauren explicitly directs otherwise.
+- This roadmap does not replace the brand voice, editorial standards, scientific positioning, production protections, or decision priorities in this file; those remain authoritative.
+
 ## Content Pipeline Orchestration
 
 - Run the Beauty Truth content pipeline only when Lauren explicitly asks to use or run it for a topic. An ordinary writing, research, or brainstorming request does not activate the pipeline.
